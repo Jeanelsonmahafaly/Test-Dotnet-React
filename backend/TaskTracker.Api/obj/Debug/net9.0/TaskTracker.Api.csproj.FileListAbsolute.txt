@@ -1,0 +1,7 @@
+/home/jeanelson/Téléchargements/Dotnet-react-Elson/backend/TaskTracker.Api/obj/Debug/net9.0/TaskTracker.Api.csproj.AssemblyReference.cache
+/home/jeanelson/Téléchargements/Dotnet-react-Elson/backend/TaskTracker.Api/obj/Debug/net9.0/TaskTracker.Api.GeneratedMSBuildEditorConfig.editorconfig
+/home/jeanelson/Téléchargements/Dotnet-react-Elson/backend/TaskTracker.Api/obj/Debug/net9.0/TaskTracker.Api.AssemblyInfoInputs.cache
+/home/jeanelson/Téléchargements/Dotnet-react-Elson/backend/TaskTracker.Api/obj/Debug/net9.0/TaskTracker.Api.AssemblyInfo.cs
+/home/jeanelson/Téléchargements/Dotnet-react-Elson/backend/TaskTracker.Api/obj/Debug/net9.0/TaskTracker.Api.csproj.CoreCompileInputs.cache
+/home/jeanelson/Téléchargements/Dotnet-react-Elson/backend/TaskTracker.Api/obj/Debug/net9.0/TaskTracker.Api.MvcApplicationPartsAssemblyInfo.cs
+/home/jeanelson/Téléchargements/Dotnet-react-Elson/backend/TaskTracker.Api/obj/Debug/net9.0/TaskTracker.Api.MvcApplicationPartsAssemblyInfo.cache
