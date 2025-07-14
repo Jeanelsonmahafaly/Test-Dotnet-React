@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using TaskTracker.Api.DTOs;
 using TaskTracker.Api.Services;
 
 namespace TaskTracker.Api.Controllers;
@@ -30,5 +31,18 @@ public class UsersController : ControllerBase
         {
             return StatusCode(500, new { error = "Internal server error", message = ex.Message });
         }
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> CreateUser([FromBody] CreateUserRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.UserName))
+        {
+            return BadRequest(new { error = "Le nom d'utilisateur est requis." });
+        }
+
+        var createdUser = await _userService.CreateUserAsync(request.UserName);
+
+        return CreatedAtAction(nameof(GetUsers), new { id = createdUser.Id }, createdUser);
     }
 }

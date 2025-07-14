@@ -10,57 +10,65 @@ builder.Services.AddControllers();
 // Database configuration
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-// SQL Server (default)
 builder.Services.AddDbContext<TaskTrackerContext>(options =>
-    options.UseSqlServer(connectionString));
-
-// Uncomment for PostgreSQL support
-// builder.Services.AddDbContext<TaskTrackerContext>(options =>
-//     options.UseNpgsql(connectionString));
+   options.UseNpgsql(connectionString));
 
 // Register services
 builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new() { 
-        Title = "Task Tracker API", 
+    c.SwaggerDoc("v1", new()
+    {
+        Title = "Task Tracker API",
         Version = "v1",
         Description = "API REST pour la gestion de tâches (Mini-Kanban)"
     });
 });
 
-// CORS configuration for React frontend
+// CORS configuration - PLUS PERMISSIVE pour le développement
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowReactApp", policy =>
+    options.AddPolicy("AllowAll", policy =>
     {
-        policy.WithOrigins("http://localhost:8080", "http://localhost:3000")
+        policy.AllowAnyOrigin()
               .AllowAnyMethod()
-              .AllowAnyHeader()
-              .AllowCredentials();
+              .AllowAnyHeader();
     });
 });
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configuration de Swagger UI
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "Task Tracker API v1");
-        c.RoutePrefix = string.Empty; // Makes Swagger UI available at the app's root
+        c.RoutePrefix = "swagger";
+        c.EnableTryItOutByDefault();
+        c.DefaultModelsExpandDepth(-1);
+        c.DocumentTitle = "Task Tracker API Documentation";
+        
+        c.ConfigObject.AdditionalItems["supportedSubmitMethods"] = new[] { "get", "post", "put", "delete" };
+        c.ConfigObject.AdditionalItems["servers"] = new[] 
+        { 
+            new { url = "http://localhost:5000", description = "Development HTTP" }
+        };
     });
 }
 
-app.UseHttpsRedirection();
+// ORDRE DES MIDDLEWARES - CRITIQUE !
+app.UseRouting();
 
-app.UseCors("AllowReactApp");
+// CORS doit être après UseRouting et avant UseAuthorization
+app.UseCors("AllowAll");
+
+// Commentez temporairement UseHttpsRedirection pour tester en HTTP
+// app.UseHttpsRedirection();
 
 app.UseAuthorization();
 

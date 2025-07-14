@@ -1,12 +1,15 @@
 using Microsoft.EntityFrameworkCore;
 using TaskTracker.Api.Data;
 using TaskTracker.Api.DTOs;
+using TaskTracker.Api.Models;
 
 namespace TaskTracker.Api.Services;
 
 public interface IUserService
 {
     Task<List<UserResponse>> GetAllUsersAsync();
+
+    Task<UserResponse> CreateUserAsync(string userName);
 }
 
 public class UserService : IUserService
@@ -26,4 +29,19 @@ public class UserService : IUserService
 
         return users.Select(u => new UserResponse(u.Id, u.UserName)).ToList();
     }
+
+    public async Task<UserResponse> CreateUserAsync(string userName)
+    {
+        var user = new User
+        {
+            Id = Guid.NewGuid(),
+            UserName = userName
+        };
+
+        _context.Users.Add(user);
+        await _context.SaveChangesAsync();
+
+        return new UserResponse(user.Id, user.UserName);
+    }
+
 }

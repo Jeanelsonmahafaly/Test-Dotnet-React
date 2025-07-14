@@ -40,8 +40,7 @@ public class TaskService : ITaskService
             .Include(t => t.AssignedTo)
             .Include(t => t.Histories)
                 .ThenInclude(h => h.ChangedBy)
-            .FirstOrDefaultAsync(t => t.Id.ToString() == id.ToString());
-
+            .FirstOrDefaultAsync(t => t.Id == id);
 
         if (task == null)
             return null;
@@ -104,8 +103,7 @@ public class TaskService : ITaskService
     {
         var task = await _context.Tasks
             .Include(t => t.AssignedTo)
-            .FirstOrDefaultAsync(t => t.Id.ToString() == id.ToString());
-
+            .FirstOrDefaultAsync(t => t.Id == id);
 
         if (task == null)
             return null;
@@ -141,7 +139,7 @@ public class TaskService : ITaskService
     {
         var task = await _context.Tasks
             .Include(t => t.AssignedTo)
-            .FirstOrDefaultAsync(t => t.Id.ToString() == id.ToString());
+            .FirstOrDefaultAsync(t => t.Id == id);
 
         if (task == null)
             return null;

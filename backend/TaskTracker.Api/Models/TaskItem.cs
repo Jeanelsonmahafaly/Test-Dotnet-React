@@ -5,7 +5,7 @@ namespace TaskTracker.Api.Models;
 
 public class TaskItem
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     
     [Required]
     [StringLength(200)]
@@ -17,7 +17,7 @@ public class TaskItem
     [Required]
     public TaskStatus Status { get; set; } = TaskStatus.ToDo;
     
-    public int? AssignedToUserId { get; set; }
+    public Guid? AssignedToUserId { get; set; }
     
     [ForeignKey(nameof(AssignedToUserId))]
     public virtual User? AssignedTo { get; set; }
