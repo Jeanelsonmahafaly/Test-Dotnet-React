@@ -1,25 +1,25 @@
-import { 
-  User, 
-  Task, 
-  TaskWithHistory, 
-  CreateTaskRequest, 
-  UpdateTaskStatusRequest, 
+import {
+  User,
+  Task,
+  TaskWithHistory,
+  CreateTaskRequest,
+  UpdateTaskStatusRequest,
   AssignTaskRequest,
-  API_BASE_URL,
-  USE_MOCK_API
+  API_BASE_URL
 } from '@/types/api';
-import { mockApiService } from './mockApi';
 
 class ApiService {
-  private baseUrl = API_BASE_URL;
+  private  baseUrl = process.env.NODE_ENV === 'production' 
+  ? 'https://api.monsite.com' 
+  : 'http://localhost:5000';
 
-  // Helper method for API calls
+  // Méthode générique pour appeler l'API
   private async fetchApi<T>(
-    endpoint: string, 
+    endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
-    
+
     const response = await fetch(url, {
       headers: {
         'Content-Type': 'application/json',
@@ -30,62 +30,51 @@ class ApiService {
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`API Error: ${response.status} - ${errorText}`);
+      throw new Error(`Erreur API : ${response.status} - ${errorText}`);
     }
 
     return response.json();
   }
 
-  // Users endpoints
+  // 🔹 Utilisateurs
   async getUsers(): Promise<User[]> {
-    if (USE_MOCK_API) {
-      return mockApiService.getUsers();
-    }
-    return this.fetchApi<User[]>('/api/users');
+    return this.fetchApi<User[]>('/api/Users');
   }
 
-  // Tasks endpoints
+  // 🔹 Tâches
   async getTasks(): Promise<Task[]> {
-    if (USE_MOCK_API) {
-      return mockApiService.getTasks();
-    }
-    return this.fetchApi<Task[]>('/api/tasks');
+    return this.fetchApi<Task[]>('/api/Tasks');
   }
 
-  async getTaskWithHistory(id: number): Promise<TaskWithHistory> {
-    if (USE_MOCK_API) {
-      return mockApiService.getTaskWithHistory(id);
-    }
-    return this.fetchApi<TaskWithHistory>(`/api/tasks/${id}`);
+  async getTaskWithHistory(id: string): Promise<TaskWithHistory> {
+    return this.fetchApi<TaskWithHistory>(`/api/Tasks/${id}`);
   }
 
   async createTask(request: CreateTaskRequest): Promise<Task> {
-    if (USE_MOCK_API) {
-      return mockApiService.createTask(request);
-    }
-    return this.fetchApi<Task>('/api/tasks', {
+    return this.fetchApi<Task>('/api/Tasks', {
       method: 'POST',
       body: JSON.stringify(request),
     });
   }
 
-  async updateTaskStatus(id: number, request: UpdateTaskStatusRequest): Promise<Task> {
-    if (USE_MOCK_API) {
-      return mockApiService.updateTaskStatus(id, request);
-    }
-    return this.fetchApi<Task>(`/api/tasks/${id}/status`, {
+  async updateTaskStatus(id: string, request: UpdateTaskStatusRequest): Promise<Task> {
+    return this.fetchApi<Task>(`/api/Tasks/${id}/status`, {
       method: 'PUT',
       body: JSON.stringify(request),
     });
   }
 
-  async assignTask(id: number, request: AssignTaskRequest): Promise<Task> {
-    if (USE_MOCK_API) {
-      return mockApiService.assignTask(id, request);
-    }
-    return this.fetchApi<Task>(`/api/tasks/${id}/assign`, {
+  async assignTask(id: string, request: AssignTaskRequest): Promise<Task> {
+    return this.fetchApi<Task>(`/api/Tasks/${id}/assign`, {
       method: 'PUT',
       body: JSON.stringify(request),
+    });
+  }
+
+  // (Facultatif) Suppression d’une tâche
+  async deleteTask(id: string): Promise<void> {
+    await this.fetchApi<void>(`/api/Tasks/${id}`, {
+      method: 'DELETE',
     });
   }
 }

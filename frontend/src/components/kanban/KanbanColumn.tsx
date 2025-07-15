@@ -8,7 +8,7 @@ interface KanbanColumnProps {
   title: string;
   status: TaskStatus;
   tasks: Task[];
-  onStatusChange: (taskId: number, newStatus: TaskStatus) => Promise<void>;
+  onStatusChange: (taskId: string, newStatus: TaskStatus) => Promise<void>;
   className?: string;
 }
 
@@ -19,16 +19,33 @@ export function KanbanColumn({
   onStatusChange, 
   className 
 }: KanbanColumnProps) {
-  const getNextStatus = (currentStatus: TaskStatus): TaskStatus | null => {
-    const validTransitions = VALID_TRANSITIONS[currentStatus];
-    return validTransitions.length > 0 ? validTransitions[0] : null;
+  
+  const getValidTransitions = (currentStatus: TaskStatus): TaskStatus[] => {
+    return VALID_TRANSITIONS[currentStatus] || [];
   };
 
-  const getActionButtonText = (currentStatus: TaskStatus): string => {
-    const nextStatus = getNextStatus(currentStatus);
-    if (!nextStatus) return '';
-    
-    switch (nextStatus) {
+  const getPrimaryTransition = (currentStatus: TaskStatus): TaskStatus | null => {
+    switch (currentStatus) {
+      case TaskStatus.ToDo:
+        return TaskStatus.InProgress;
+      case TaskStatus.InProgress:
+        return TaskStatus.Done;
+      case TaskStatus.Done:
+        return TaskStatus.InProgress;
+      default:
+        const transitions = getValidTransitions(currentStatus);
+        return transitions.length > 0 ? transitions[0] : null;
+    }
+  };
+
+  const getSecondaryTransitions = (currentStatus: TaskStatus): TaskStatus[] => {
+    const validTransitions = getValidTransitions(currentStatus);
+    const primary = getPrimaryTransition(currentStatus);
+    return validTransitions.filter(t => t !== primary);
+  };
+
+  const getActionButtonText = (targetStatus: TaskStatus): string => {
+    switch (targetStatus) {
       case TaskStatus.InProgress:
         return 'Commencer';
       case TaskStatus.Done:
@@ -40,6 +57,20 @@ export function KanbanColumn({
     }
   };
 
+  const getButtonVariant = (
+    targetStatus: TaskStatus
+  ): 'default' | 'secondary' | 'outline' => {
+    switch (targetStatus) {
+      case TaskStatus.InProgress:
+      case TaskStatus.Done:
+        return 'default';
+      case TaskStatus.ToDo:
+        return 'outline';
+      default:
+        return 'secondary';
+    }
+  };
+
   return (
     <Card className={cn(
       "min-h-[600px] border-2 transition-all duration-300 hover:shadow-elevated",
@@ -48,12 +79,10 @@ export function KanbanColumn({
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-foreground">{title}</h2>
-          <Badge variant="secondary" className="bg-white/80">
-            {tasks.length}
-          </Badge>
+          <Badge variant="secondary" className="bg-white/80">{tasks.length}</Badge>
         </div>
       </CardHeader>
-      
+
       <CardContent className="pt-0">
         <div className="space-y-3">
           {tasks.length === 0 ? (
@@ -62,20 +91,27 @@ export function KanbanColumn({
               <p className="text-sm">Aucune tâche</p>
             </div>
           ) : (
-            tasks.map((task) => (
-              <TaskCard
-                key={task.id}
-                task={task}
-                actionButtonText={getActionButtonText(task.status)}
-                onAction={() => {
-                  const nextStatus = getNextStatus(task.status);
-                  if (nextStatus) {
-                    onStatusChange(task.id, nextStatus);
-                  }
-                }}
-                showActionButton={getNextStatus(task.status) !== null}
-              />
-            ))
+            tasks.map((task) => {
+              const primaryTransition = getPrimaryTransition(task.status);
+              const secondaryTransitions = getSecondaryTransitions(task.status);
+
+              return (
+                <TaskCard
+                  key={task.id}
+                  task={task}
+                  primaryAction={primaryTransition ? {
+                    text: getActionButtonText(primaryTransition),
+                    variant: getButtonVariant(primaryTransition),
+                    onClick: () => onStatusChange(task.id, primaryTransition)
+                  } : undefined}
+                  secondaryActions={secondaryTransitions.map(transition => ({
+                    text: getActionButtonText(transition),
+                    variant: getButtonVariant(transition),
+                    onClick: () => onStatusChange(task.id, transition)
+                  }))}
+                />
+              );
+            })
           )}
         </div>
       </CardContent>

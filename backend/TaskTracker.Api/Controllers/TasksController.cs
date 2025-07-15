@@ -92,8 +92,9 @@ public class TasksController : ControllerBase
         }
     }
 
-    [HttpPut("{id}/assign")]
-    public async Task<IActionResult> AssignTask(Guid id, [FromBody] AssignTaskRequest request)
+  [HttpPut("{id}/assign")]
+   public async Task<IActionResult> AssignTask(Guid id, [FromBody] AssignTaskRequest request)
+    
     {
         try
         {

@@ -2,6 +2,12 @@ using TaskTracker.Api.Models;
 using TaskStatusEnum = TaskTracker.Api.Models.TaskStatus;
 namespace TaskTracker.Api.DTOs;
 
+public record AssignTaskRequest(
+    Guid? AssignedToUserId,
+    Guid ChangedByUserId
+);
+
+
 public class CreateTaskRequest
 {
     public string Title { get; init; } = string.Empty;
@@ -13,11 +19,6 @@ public class CreateTaskRequest
 
 public record UpdateTaskStatusRequest(
     TaskStatusEnum NewStatus,
-    Guid ChangedByUserId
-);
-
-public record AssignTaskRequest(
-    Guid? AssignedToUserId,
     Guid ChangedByUserId
 );
 

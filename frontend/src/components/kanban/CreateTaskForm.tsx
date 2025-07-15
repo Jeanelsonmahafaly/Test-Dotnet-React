@@ -10,7 +10,7 @@ import { Plus, Loader2 } from 'lucide-react';
 
 interface CreateTaskFormProps {
   onTaskCreated: (task: Task) => void;
-  currentUserId: number;
+  currentUserId: string;
 }
 
 export function CreateTaskForm({ onTaskCreated, currentUserId }: CreateTaskFormProps) {
